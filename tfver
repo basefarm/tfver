@@ -33,10 +33,13 @@ function tfver() {
   shift $((OPTIND-1))
 
   if test -z "$(readlink "${BASH_SOURCE}")" ; then
-    TFVERBASEDIR="$(dirname "${BASH_SOURCE}")"
+    local tmpdir="$(dirname "${BASH_SOURCE}")"
   else
-    TFVERBASEDIR="$(dirname "$(readlink "${BASH_SOURCE}")")"
+    local tmpdir="$(dirname "$(readlink "${BASH_SOURCE}")")"
   fi
+  pushd $tmpdir &>/dev/null
+  TFVERBASEDIR=`pwd`
+  popd &>/dev/null
 
   if (( TFVERUPGRADE )) ; then
     local USESUDO=0
@@ -129,20 +132,19 @@ function tfver() {
         fi
       else
         echo "# WARN no userspecifc version definition found, nothing to unconfigure."
-        return 0
       fi
     else
       if test -x "${TFVERBASEDIR}/binlib/${1}/terraform" ; then
         if test -w ~/ ; then
           echo "TFVERDEFAULT=${1}" > ~/.tfverrc
           echo "# INFO userspecific version set to $1"
+          TFVERDEFAULT=${1}
         else
           echo "# ERROR Unable to configure userspecific version. ~/ not writable by user $USER"
           return 1
         fi
       else
         echo "# ERROR Unable to configure userspecific version. No version $1 available."
-        return 1
       fi
     fi
   fi
