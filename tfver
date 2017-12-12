@@ -44,7 +44,19 @@ function tfver() {
   if (( TFVERUPGRADE )) ; then
     local USESUDO=0
     echo "# Upgrading"
-    if ! test -w "${TFVERBASEDIR}/binlib" ; then echo
+    if ! test -d "${TFVERBASEDIR}/binlib" ; then
+      if test -w "${TFVERBASEDIR}" ; then
+        mkdir -p "${TFVERBASEDIR}/binlib"
+      else
+        if sudo -n true &>/dev/null ; then
+          sudo mkdir -p "${TFVERBASEDIR}/binlib"
+        else
+          "# ERROR: cannot create folder ${TFVERBASEDIR}/binlib, so upgrade cannot be performed"
+          return 1
+        fi
+      fi
+    fi
+    if ! test -w "${TFVERBASEDIR}/binlib" ; then
       if sudo -n true &>/dev/null ; then
         USESUDO=1
       else
