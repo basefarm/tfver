@@ -49,8 +49,8 @@ function tfver() {
         USESUDO=1
       else
         "# ERROR: cannot write to ${TFVERBASEDIR}/binlib, so upgrade cannot be performed"
+        return 1
       fi
-      return 1
     fi
 
     if test -z $1 ; then
