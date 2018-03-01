@@ -19,13 +19,14 @@ function tfver() {
   shopt -s extglob
   local OPTIND ; local TFVERINSTALL=0 ; local TFVERUPGRADE=0 ; local TFVERLIST=0 ; local TFVERCONFIGURE ; local TFVERBASEDIR ; local TFVERDEFAULT
 
-  while getopts ":chilu" opt ; do
+  while getopts ":cdhilu" opt ; do
 		case "$opt" in
 			h		) _tfver_usage ; return 0 ;;
 			i		) TFVERINSTALL=1 ;;
 			l		) TFVERLIST=1 ;;
       u   ) TFVERUPGRADE=1 ;;
       c   ) TFVERCONFIGURE=1 ;;
+      d   ) DEBUG=1 ;;
 			\?	) echo "Invalid option: -$OPTARG" >&2 ;;
 			:		) echo "Option -$OPTARG requires an argument." >&2 ; exit 1 ;;
     esac
@@ -39,6 +40,7 @@ function tfver() {
   fi
   pushd $tmpdir &>/dev/null
   TFVERBASEDIR=`pwd`
+	if (( DEBUG )) ; then echo "TFVERBASEDIR = ${TFVERBASEDIR}" ; fi
   popd &>/dev/null
 
   if (( TFVERUPGRADE )) ; then
@@ -77,7 +79,7 @@ function tfver() {
     else
       local MYMINOR="${2}"
     fi
-
+		if (( DEBUG )) ; then echo "MYDLVER = ${MYDLVER}" ; echo "MYMINOR = ${MYMINOR}" ; fi
     local MYTMPFILE="$(mktemp)"
     curl -so "${MYTMPFILE}" "${MYURL}"
     if test -d "${TFVERBASEDIR}/binlib/${MYMINOR}" ; then
@@ -112,7 +114,7 @@ function tfver() {
   if test -z "${TFVERDEFAULT}" ; then
     TFVERDEFAULT="$(ls -1 ${TFVERBASEDIR}/binlib/*/terraform | rev | cut -d '/' -f 2 | rev|sort --version-sort | tail -n 1)"
     if test -z "${TFVERDEFAULT}" ; then
-      echo "ERROR: No versions of Terraform found in ${TFVERBASEDIR}/binlib"
+      [[ $- =~ i ]] && echo "ERROR: No versions of Terraform found in ${TFVERBASEDIR}/binlib"
     fi
   fi
 
@@ -173,12 +175,12 @@ function tfver() {
   fi
   local TFVER="${1:-${TFVERDEFAULT}}"
   if ! test -x "${TFVERBASEDIR}/binlib/${TFVER}/terraform" ; then
-    echo "# WARNING Version '$1' not found, using default instead. Use 'tfver -l' to see available versions"
+    [[ $- =~ i ]] && echo "# WARNING Version '$1' not found, using default instead. Use 'tfver -l' to see available versions"
     TFVER="${TFVERDEFAULT}"
   fi
   export PATH="${PATH//${TFVERBASEDIR}\/binlib\/*([a-z0-9.])/${TFVERBASEDIR}/binlib/${TFVER}}"
   eval ${tfver_globstate}
   unset tfver_globstate
-  terraform version
+  [[ $- =~ i ]] && terraform version
 }
 tfver
