@@ -181,6 +181,8 @@ function tfver() {
   export PATH="${PATH//${TFVERBASEDIR}\/binlib\/*([a-z0-9.])/${TFVERBASEDIR}/binlib/${TFVER}}"
   eval ${tfver_globstate}
   unset tfver_globstate
-  [[ $- =~ i ]] && terraform version
+  if [[ $- =~ i ]] ; then
+    terraform version
+  fi
 }
 tfver
