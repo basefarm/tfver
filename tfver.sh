@@ -183,4 +183,9 @@ function tfver() {
   unset tfver_globstate
   [[ $- =~ i ]] && terraform version
 }
-tfver
+if test $UID -eq 0 ; then
+  return 0
+else
+  tfver
+fi
+
