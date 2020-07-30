@@ -132,10 +132,10 @@ function tfver() {
   if (( TFVERINSTALL )) ; then
     echo "# Installing"
     if test -w /etc/profile.d ; then
-      ln "${TFVERBASEDIR}/tfver" -sfbn /etc/profile.d/tfver.sh
+      ln "${TFVERBASEDIR}/tfver.sh" -sfbn /etc/profile.d/tfver.sh
     else
       if sudo -n true &>/dev/null ; then 
-        sudo ln "${TFVERBASEDIR}/tfver" -sfbn /etc/profile.d/tfver.sh
+        sudo ln "${TFVERBASEDIR}/tfver.sh" -sfbn /etc/profile.d/tfver.sh
       else
         echo "# Warning: User $USER is not allowed to write to /etc/profile.d or use sudo, so this must be done manually by root:"
         echo "ln -sfbn \"${TFVERBASEDIR}/tfver\" /etc/profile.d/tfver.sh"
